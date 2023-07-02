@@ -25,7 +25,7 @@ function Rectangle(width, height) {
     width,
     height,
   };
-  res.getArea = function () {
+  res.getArea = function getArea() {
     return this.width * this.height;
   };
   return res;
@@ -198,11 +198,9 @@ class Builder {
     return this;
   }
 
-  // combine(selector1, combinator, selector2) {
   combine() {
     let comb = '';
     comb = `${this.selector1.stringify()} ${this.combinator} ${this.selector2.stringify()}`;
-    // console.log('comb ', comb);
     this.comb = comb;
     return this;
   }
@@ -236,7 +234,6 @@ class Builder {
     if (this.ppseudoElement) {
       res += `::${this.ppseudoElement}`;
     }
-    console.log('res ', res);
     return res;
   }
 }
