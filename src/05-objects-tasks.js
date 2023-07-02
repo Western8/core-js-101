@@ -20,8 +20,15 @@
  *    console.log(r.height);      // => 20
  *    console.log(r.getArea());   // => 200
  */
-function Rectangle(/* width, height */) {
-  throw new Error('Not implemented');
+function Rectangle(width, height) {
+  const res = {
+    width,
+    height,
+  };
+  res.getArea = function () {
+    return this.width * this.height;
+  };
+  return res;
 }
 
 
@@ -35,8 +42,8 @@ function Rectangle(/* width, height */) {
  *    [1,2,3]   =>  '[1,2,3]'
  *    { width: 10, height : 20 } => '{"height":10,"width":20}'
  */
-function getJSON(/* obj */) {
-  throw new Error('Not implemented');
+function getJSON(obj) {
+  return JSON.stringify(obj);
 }
 
 
@@ -51,8 +58,10 @@ function getJSON(/* obj */) {
  *    const r = fromJSON(Circle.prototype, '{"radius":10}');
  *
  */
-function fromJSON(/* proto, json */) {
-  throw new Error('Not implemented');
+function fromJSON(proto, json) {
+  const res = JSON.parse(json);
+  Object.setPrototypeOf(res, proto);
+  return res;
 }
 
 
@@ -110,34 +119,158 @@ function fromJSON(/* proto, json */) {
  *  For more examples see unit tests.
  */
 
+
+class Builder {
+  constructor(selector, value, selector1 = null, combinator = null, selector2 = null) {
+    if (selector === 'combine') {
+      this.selector1 = selector1;
+      this.combinator = combinator;
+      this.selector2 = selector2;
+      this.combine();
+    }
+    if (selector === 'class' || selector === 'pseudoClass') {
+      this['p'.concat(selector)] = [value];
+    } else {
+      this['p'.concat(selector)] = value;
+    }
+  }
+
+  element(value) {
+    this.temp = value;
+    if (this.pelement) {
+      throw new Error('/Element, id and pseudo-element should not occur more then one time inside the selector/');
+    }
+
+    if ((this.pid) || (this.pclass) || (this.pattr) || (this.ppseudoClass)
+      || (this.ppseudoElement)) {
+      throw new Error('/Selector parts should be arranged in the following order: element, id, class, attribute, pseudo-class, pseudo-element/');
+    }
+  }
+
+  id(value) {
+    if (this.pid) {
+      throw new Error('/Element, id and pseudo-element should not occur more then one time inside the selector/');
+    }
+    if ((this.pclass) || (this.pattr) || (this.ppseudoClass) || (this.ppseudoElement)) {
+      throw new Error('/Selector parts should be arranged in the following order: element, id, class, attribute, pseudo-class, pseudo-element/');
+    }
+    this.pid = value;
+    return this;
+  }
+
+  class(value) {
+    if ((this.pattr) || (this.ppseudoClass) || (this.ppseudoElement)) {
+      throw new Error('/Selector parts should be arranged in the following order: element, id, class, attribute, pseudo-class, pseudo-element/');
+    }
+    if (this.pclass) {
+      this.pclass.push(value);
+    } else {
+      this.pclass = [value];
+    }
+    return this;
+  }
+
+  attr(value) {
+    if ((this.ppseudoClass) || (this.ppseudoElement)) {
+      throw new Error('/Selector parts should be arranged in the following order: element, id, class, attribute, pseudo-class, pseudo-element/');
+    }
+    this.pattr = value;
+    return this;
+  }
+
+  pseudoClass(value) {
+    if (this.ppseudoElement) {
+      throw new Error('/Selector parts should be arranged in the following order: element, id, class, attribute, pseudo-class, pseudo-element/');
+    }
+    if (this.ppseudoClass) {
+      this.ppseudoClass.push(value);
+    } else {
+      this.ppseudoClass = [value];
+    }
+    return this;
+  }
+
+  pseudoElement(value) {
+    if (this.ppseudoElement) {
+      throw new Error('/Element, id and pseudo-element should not occur more then one time inside the selector/');
+    }
+    this.ppseudoElement = value;
+    return this;
+  }
+
+  // combine(selector1, combinator, selector2) {
+  combine() {
+    let comb = '';
+    comb = `${this.selector1.stringify()} ${this.combinator} ${this.selector2.stringify()}`;
+    // console.log('comb ', comb);
+    this.comb = comb;
+    return this;
+  }
+
+  stringify() {
+    let res = '';
+
+    if (this.comb) {
+      return this.comb;
+    }
+
+    if (this.pelement) {
+      res += this.pelement;
+    }
+    if (this.pid) {
+      res += `#${this.pid}`;
+    }
+    if (this.pclass) {
+      let name = this.pclass.map((item) => `.${item}`);
+      name = name.join('');
+      res += name;
+    }
+    if (this.pattr) {
+      res += `[${this.pattr}]`;
+    }
+    if (this.ppseudoClass) {
+      let name = this.ppseudoClass.map((item) => `:${item}`);
+      name = name.join('');
+      res += name;
+    }
+    if (this.ppseudoElement) {
+      res += `::${this.ppseudoElement}`;
+    }
+    console.log('res ', res);
+    return res;
+  }
+}
+
 const cssSelectorBuilder = {
-  element(/* value */) {
-    throw new Error('Not implemented');
+  element(value) {
+    return new Builder('element', value);
   },
 
-  id(/* value */) {
-    throw new Error('Not implemented');
+  id(value) {
+    return new Builder('id', value);
   },
 
-  class(/* value */) {
-    throw new Error('Not implemented');
+  class(value) {
+    return new Builder('class', value);
   },
 
-  attr(/* value */) {
-    throw new Error('Not implemented');
+  attr(value) {
+    return new Builder('attr', value);
   },
 
-  pseudoClass(/* value */) {
-    throw new Error('Not implemented');
+  pseudoClass(value) {
+    return new Builder('pseudoClass', value);
   },
 
-  pseudoElement(/* value */) {
-    throw new Error('Not implemented');
+  pseudoElement(value) {
+    return new Builder('pseudoElement', value);
   },
 
-  combine(/* selector1, combinator, selector2 */) {
-    throw new Error('Not implemented');
+  combine(selector1, combinator, selector2) {
+    return new Builder('combine', null, selector1, combinator, selector2);
+    // throw new Error('Not implemented');
   },
+
 };
 
 
