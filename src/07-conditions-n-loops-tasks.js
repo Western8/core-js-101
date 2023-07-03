@@ -55,8 +55,12 @@ function getFizzBuzz(num) {
  *   5  => 120
  *   10 => 3628800
  */
-function getFactorial(/* n */) {
-  throw new Error('Not implemented');
+function getFactorial(n) {
+  let res = 1;
+  for (let k = 1; k <= n; k += 1) {
+    res *= k;
+  }
+  return res;
 }
 
 
@@ -72,8 +76,12 @@ function getFactorial(/* n */) {
  *   5,10  =>  45 ( = 5+6+7+8+9+10 )
  *   -1,1  =>  0  ( = -1 + 0 + 1 )
  */
-function getSumBetweenNumbers(/* n1, n2 */) {
-  throw new Error('Not implemented');
+function getSumBetweenNumbers(n1, n2) {
+  let res = 0;
+  for (let k = n1; k <= n2; k += 1) {
+    res += k;
+  }
+  return res;
 }
 
 
@@ -92,8 +100,8 @@ function getSumBetweenNumbers(/* n1, n2 */) {
  *   10,1,1   =>  false
  *   10,10,10 =>  true
  */
-function isTriangle(/* a, b, c */) {
-  throw new Error('Not implemented');
+function isTriangle(a, b, c) {
+  return (((a + b) > c) && ((a + c) > b) && ((b + c) > a));
 }
 
 
@@ -129,8 +137,16 @@ function isTriangle(/* a, b, c */) {
  *   { top:20, left:20, width: 20, height: 20 }    =>  false
  *
  */
-function doRectanglesOverlap(/* rect1, rect2 */) {
-  throw new Error('Not implemented');
+function doRectanglesOverlap(rect1, rect2) {
+  const rect1rigth = rect1.left + rect1.width;
+  const rect1bottom = rect1.top + rect1.height;
+  const rect2rigth = rect2.left + rect2.width;
+  const rect2bottom = rect2.top + rect2.height;
+  if ((rect2.top < rect1bottom) && (rect2bottom > rect1.top)
+    && (rect2.left < rect1rigth) && (rect2rigth > rect1.left)) {
+    return true;
+  }
+  return false;
 }
 
 
@@ -160,8 +176,9 @@ function doRectanglesOverlap(/* rect1, rect2 */) {
  *   { center: { x:0, y:0 }, radius:10 },  { x:10, y:10 }   => false
  *
  */
-function isInsideCircle(/* circle, point */) {
-  throw new Error('Not implemented');
+function isInsideCircle(circle, point) {
+  const r2 = Math.sqrt((point.y - circle.center.y) ** 2 + (point.x - circle.center.x) ** 2);
+  return r2 < circle.radius;
 }
 
 
@@ -176,8 +193,15 @@ function isInsideCircle(/* circle, point */) {
  *   'abracadabra'  => 'c'
  *   'entente' => null
  */
-function findFirstSingleChar(/* str */) {
-  throw new Error('Not implemented');
+function findFirstSingleChar(str) {
+  const arr = str.split('');
+  const doubles = arr.filter((item, index, array) => (array.indexOf(item) !== index));
+  for (let k = 0; k < str.length; k += 1) {
+    if (!doubles.includes(str[k])) {
+      return str[k];
+    }
+  }
+  return null;
 }
 
 
