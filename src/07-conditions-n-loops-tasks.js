@@ -227,8 +227,15 @@ function findFirstSingleChar(str) {
  *   5, 3, true, true   => '[3, 5]'
  *
  */
-function getIntervalString(/* a, b, isStartIncluded, isEndIncluded */) {
-  throw new Error('Not implemented');
+function getIntervalString(a, b, isStartIncluded, isEndIncluded) {
+  let a2 = a;
+  let b2 = b;
+  if (b2 < a2) {
+    a2 = b;
+    b2 = a;
+  }
+  const res = `${isStartIncluded ? '[' : '('}${a2}, ${b2}${isEndIncluded ? ']' : ')'}`;
+  return res;
 }
 
 
@@ -244,8 +251,8 @@ function getIntervalString(/* a, b, isStartIncluded, isEndIncluded */) {
  * 'rotator' => 'rotator'
  * 'noon' => 'noon'
  */
-function reverseString(/* str */) {
-  throw new Error('Not implemented');
+function reverseString(str) {
+  return str.split('').reverse().join('');
 }
 
 
@@ -261,8 +268,8 @@ function reverseString(/* str */) {
  *   87354 => 45378
  *   34143 => 34143
  */
-function reverseInteger(/* num */) {
-  throw new Error('Not implemented');
+function reverseInteger(num) {
+  return +(num.toString().split('').reverse().join(''));
 }
 
 
@@ -286,8 +293,34 @@ function reverseInteger(/* num */) {
  *   5436468789016589 => false
  *   4916123456789012 => false
  */
-function isCreditCardNumber(/* ccn */) {
-  throw new Error('Not implemented');
+function isCreditCardNumber(ccn) {
+  let arr = ccn.toString().split('');
+  arr = arr.map((item, index) => {
+    if (arr.length % 2 === 0) {
+      if ((index + 1) % 2 !== 0) {
+        let k = +item * 2;
+        if (k > 9) {
+          k -= 9;
+        }
+        return k;
+      }
+      return +item;
+    }
+    if ((index + 1) % 2 === 0) {
+      let k = +item * 2;
+      if (k > 9) {
+        k -= 9;
+      }
+      return k;
+    }
+    return +item;
+  });
+
+  const sum = arr.reduce((acum, item) => acum + item, 0);
+  if (sum % 10 === 0) {
+    return true;
+  }
+  return false;
 }
 
 /**
@@ -304,8 +337,13 @@ function isCreditCardNumber(/* ccn */) {
  *   10000 ( 1+0+0+0+0 = 1 ) => 1
  *   165536 (1+6+5+5+3+6 = 26,  2+6 = 8) => 8
  */
-function getDigitalRoot(/* num */) {
-  throw new Error('Not implemented');
+function getDigitalRoot(num) {
+  const arr = num.toString().split('').map((item) => +item);
+  let sum = arr.reduce((acum, item) => acum + item, 0);
+  if (sum > 9) {
+    sum = getDigitalRoot(sum);
+  }
+  return sum;
 }
 
 
@@ -330,8 +368,35 @@ function getDigitalRoot(/* num */) {
  *   '{)' = false
  *   '{[(<{[]}>)]}' = true
  */
-function isBracketsBalanced(/* str */) {
-  throw new Error('Not implemented');
+function isBracketsBalanced(str) {
+  const bracketsOpen = ['[', '(', '{', '<'];
+  const bracketsClose = [']', ')', '}', '>'];
+  const arr = str.split('');
+  const arrCurrent = [];
+  let err = false;
+
+  arr.forEach((item) => {
+    if (bracketsOpen.includes(item)) {
+      if (bracketsClose.includes(item)) {
+        if (arrCurrent.at(-1) === item) {
+          arrCurrent.pop();
+        } else {
+          arrCurrent.push(item);
+        }
+      } else {
+        arrCurrent.push(item);
+      }
+    } else if (bracketsClose.includes(item)) {
+      const brOpen = bracketsOpen[bracketsClose.indexOf(item)];
+      if (arrCurrent.at(-1) === brOpen) {
+        arrCurrent.pop();
+      } else {
+        err = true;
+      }
+    }
+  });
+
+  return ((arrCurrent.length === 0) && !err);
 }
 
 
@@ -355,8 +420,16 @@ function isBracketsBalanced(/* str */) {
  *    365, 4  => '11231'
  *    365, 10 => '365'
  */
-function toNaryString(/* num, n */) {
-  throw new Error('Not implemented');
+function toNaryString(num, n) {
+  let k = num;
+  const res = [];
+  while (k >= n) {
+    const ost = k % n;
+    res.push(ost);
+    k = Math.floor(k / n);
+  }
+  res.push(k);
+  return res.reverse().join('');
 }
 
 
@@ -372,8 +445,37 @@ function toNaryString(/* num, n */) {
  *   ['/web/assets/style.css', '/.bin/mocha',  '/read.me'] => '/'
  *   ['/web/favicon.ico', '/web-scripts/dump', '/verbalizer/logs'] => '/'
  */
-function getCommonDirectoryPath(/* pathes */) {
-  throw new Error('Not implemented');
+function getCommonDirectoryPath(pathes) {
+  let res = '';
+  let arrCur = pathes[0].split('');
+  let arrRes = [];
+
+  for (let p = 1; p < pathes.length; p += 1) {
+    const arrNext = pathes[p].split('');
+    const len = Math.min(arrCur.length, arrNext.length);
+    for (let k = 0; k < len; k += 1) {
+      if (arrCur[k] === arrNext[k]) {
+        arrRes.push(arrCur[k]);
+      } else {
+        break;
+      }
+    }
+    arrCur = Array.from(arrRes);
+    if (p < (pathes.length - 1)) {
+      arrRes = [];
+    }
+  }
+
+  if (arrRes.length === 0) {
+    return '';
+  }
+  if (arrRes.length === 1) {
+    return arrRes[0];
+  }
+
+  arrRes = arrRes.slice(0, arrRes.lastIndexOf('/') + 1);
+  res = arrRes.join('');
+  return res;
 }
 
 
@@ -395,8 +497,34 @@ function getCommonDirectoryPath(/* pathes */) {
  *                         [ 6 ]]
  *
  */
-function getMatrixProduct(/* m1, m2 */) {
-  throw new Error('Not implemented');
+function getMatrixProduct(m1, m2) {
+  const size = m1.length;
+  const res = new Array(size);
+  const res2 = new Array(size);
+  res2.fill(0);
+  res.fill(res2);
+  for (let i = 0; i < size; i += 1) {
+    const str = [];
+    if (m1.length === m2.length) {
+      for (let t = 0; t < m2.length; t += 1) {
+        let sum = 0;
+        for (let s = 0; s < m1.length; s += 1) {
+          sum += m1[s][t] * m2[i][t];
+        }
+        str.push(sum);
+      }
+    } else {
+      for (let t = 0; t < m1.length; t += 1) {
+        let sum = 0;
+        for (let s = 0; s < m2.length; s += 1) {
+          sum += m1[t][s] * m2[s][i];
+        }
+        str.push(sum);
+      }
+    }
+    res[i] = str;
+  }
+  return res;
 }
 
 
@@ -430,8 +558,26 @@ function getMatrixProduct(/* m1, m2 */) {
  *    [    ,   ,    ]]
  *
  */
-function evaluateTicTacToePosition(/* position */) {
-  throw new Error('Not implemented');
+function evaluateTicTacToePosition(position) {
+  const arr = position;
+
+  if ((arr[0][2]) && (arr[0][2] === arr[1][1]) && (arr[0][2] === arr[2][0])) {
+    return arr[0][2];
+  }
+
+  for (let k = 0; k < arr.length; k += 1) {
+    if ((arr[k][0]) && (arr[k][0] === arr[k][1]) && (arr[k][0] === arr[k][2])) {
+      return arr[k][0];
+    }
+    if ((arr[0][k]) && (arr[0][k] === arr[1][k]) && (arr[0][k] === arr[2][k])) {
+      return arr[0][k];
+    }
+    if ((arr[k][k]) && (arr[k][k] === arr[0][0]) && (arr[k][k] === arr[1][1])
+      && (arr[k][k] === arr[2][2])) {
+      return arr[k][k];
+    }
+  }
+  return undefined;
 }
 
 
